@@ -32,21 +32,33 @@ TAG=${ARGS[0]:-}
 ZIP=${ARGS[1]:-$(ls -t "$HERE"/out/dist/SilverArrow-KSUN-SUSFS-uke-*.zip 2>/dev/null | head -1)}
 [ -f "$ZIP" ] || { echo "no zip to release, run ./build.sh first" >&2; exit 1; }
 
-# KernelSU-Next manager, the plain (not spoofed) APK
+# KernelSU-Next manager: the plain APK, plus the spoofed one (random package
+# name) when it comes from a CI run
+SPOOF_APK=
 if [ -n "$KSUN_MANAGER_RUN" ]; then
     MGR_DIR=$HERE/out/manager/run-$KSUN_MANAGER_RUN
     MGR_URL=https://github.com/$KSUN_REPO/actions/runs/$KSUN_MANAGER_RUN
     MGR_FROM="KernelSU-Next's [Build Manager CI run]($MGR_URL) for the imported commit"
     mkdir -p "$MGR_DIR"
-    ART=$(gh api "repos/$KSUN_REPO/actions/runs/$KSUN_MANAGER_RUN/artifacts" \
-        -q '.artifacts[] | select(.name == "manager") | "\(.id) \(.digest)"')
-    [ -n "$ART" ] || { echo "no manager artifact in run $KSUN_MANAGER_RUN" >&2; exit 1; }
-    ART_ID=${ART%% *}; WANT=${ART#* }; WANT=${WANT#sha256:}
-    ART_ZIP=$MGR_DIR/manager.zip
-    [ -f "$ART_ZIP" ] || gh api "repos/$KSUN_REPO/actions/artifacts/$ART_ID/zip" > "$ART_ZIP"
-    [ "$(sha256sum "$ART_ZIP" | cut -d' ' -f1)" = "$WANT" ] || { echo "manager artifact does not match GitHub's digest" >&2; exit 1; }
-    APK_NAME=$(unzip -Z1 "$ART_ZIP" | grep -m1 '^KernelSU_Next_.*-release\.apk$')
-    unzip -o -q "$ART_ZIP" "$APK_NAME" -d "$MGR_DIR"
+    # ci_apk <artifact name>: download the artifact, check GitHub's digest,
+    # extract its release APK and print the APK's name
+    ci_apk() {
+        local art id want zip apk
+        art=$(gh api "repos/$KSUN_REPO/actions/runs/$KSUN_MANAGER_RUN/artifacts" \
+            -q ".artifacts[] | select(.name == \"$1\") | \"\\(.id) \\(.digest)\"")
+        [ -n "$art" ] || { echo "no $1 artifact in run $KSUN_MANAGER_RUN" >&2; return 1; }
+        id=${art%% *}; want=${art#* }; want=${want#sha256:}
+        zip=$MGR_DIR/$1.zip
+        [ -f "$zip" ] || gh api "repos/$KSUN_REPO/actions/artifacts/$id/zip" > "$zip"
+        [ "$(sha256sum "$zip" | cut -d' ' -f1)" = "$want" ] || { echo "$1 artifact does not match GitHub's digest" >&2; return 1; }
+        apk=$(unzip -Z1 "$zip" | grep -m1 '^KernelSU_Next_.*-release\.apk$')
+        unzip -o -q "$zip" "$apk" -d "$MGR_DIR"
+        (cd "$MGR_DIR" && sha256sum "$apk" > "$apk.sha256sum")
+        echo "$apk"
+    }
+    APK_NAME=$(ci_apk manager)
+    SPOOF_NAME=$(ci_apk manager-spoofed)
+    SPOOF_APK=$MGR_DIR/$SPOOF_NAME
 else
     MGR_DIR=$HERE/out/manager/$KSUN_MANAGER
     MGR_FROM="the official [$KSUN_MANAGER](https://github.com/$KSUN_REPO/releases/tag/$KSUN_MANAGER) release"
@@ -56,10 +68,10 @@ else
     [ -f "$MGR_DIR/$APK_NAME" ] || gh release download "$KSUN_MANAGER" --repo "$KSUN_REPO" -p "$APK_NAME" -D "$MGR_DIR"
     WANT=$(gh api "repos/$KSUN_REPO/releases/tags/$KSUN_MANAGER" \
         -q ".assets[] | select(.name == \"$APK_NAME\") | .digest" | sed 's/^sha256://')
+    (cd "$MGR_DIR" && sha256sum "$APK_NAME" > "$APK_NAME.sha256sum")
+    [ "$(cut -d' ' -f1 "$MGR_DIR/$APK_NAME.sha256sum")" = "$WANT" ] || { echo "$APK_NAME does not match GitHub's digest" >&2; exit 1; }
 fi
 APK=$MGR_DIR/$APK_NAME
-(cd "$MGR_DIR" && sha256sum "$APK_NAME" > "$APK_NAME.sha256sum")
-[ -n "$KSUN_MANAGER_RUN" ] || [ "$(cut -d' ' -f1 "$APK.sha256sum")" = "$WANT" ] || { echo "$APK_NAME does not match GitHub's digest" >&2; exit 1; }
 
 CHANGES=$(awk -v t="## $TAG " 'index($0, t) == 1 {f = 1; next} /^## / {f = 0} f' "$HERE/CHANGELOG.md")
 [ -n "$CHANGES" ] || { echo "no \"## $TAG\" section in CHANGELOG.md" >&2; exit 1; }
@@ -80,15 +92,20 @@ Needs an unlocked bootloader. Full steps and how to go back:
 Install the KernelSU-Next manager attached here (\`$APK_NAME\`, from
 $MGR_FROM, signed with KernelSU-Next's release key) to manage root. The
 kernel needs a manager that supports KernelSU UAPI 6: the v3.4.2 release
-manager doesn't.
+manager doesn't.$([ -n "$SPOOF_APK" ] && printf '\n\n%s\n%s\n%s' \
+"\`$SPOOF_NAME\` is the same build with a random package name, for apps that" \
+"look for KernelSU-Next's. Install one manager or the other, not both: uninstall" \
+"the plain one first.")
 
 ## SHA-256
 
 - \`$(basename "$ZIP")\`: \`$(cut -d' ' -f1 "$ZIP.sha256sum")\`
 - \`$APK_NAME\`: \`$(cut -d' ' -f1 "$APK.sha256sum")\`
+$([ -n "$SPOOF_APK" ] && echo "- \`$SPOOF_NAME\`: \`$(cut -d' ' -f1 "$SPOOF_APK.sha256sum")\`")
 NOTES_EOF
 
 FILES=("$ZIP" "$ZIP.sha256sum" "$APK" "$APK.sha256sum")
+[ -n "$SPOOF_APK" ] && FILES+=("$SPOOF_APK" "$SPOOF_APK.sha256sum")
 if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
     gh release upload "$TAG" "${FILES[@]}" --repo "$REPO" --clobber
     gh release edit "$TAG" --repo "$REPO" --title "SilverArrow $TAG" --notes-file "$NOTES"

@@ -24,3 +24,4 @@ Kernel `6.1.182-SilverArrow-android14-11-14485-gd153dc47cbdb`
 - KernelSU-Next manager v3.4.2-200-g32e25d58 (33555) attached to the release:
   KernelSU-Next's CI build of the imported commit, signed with their release
   key. The v3.4.2 release manager doesn't support this kernel (UAPI 6)
+- Spoofed build of the same manager (random package name) attached as well

@@ -49,6 +49,10 @@ the ROM update brings its own kernel.
   CI build of the commit in this kernel, signed with their release key) to
   manage root. It installs over an existing KernelSU-Next manager. The v3.4.2
   release manager is too old for this kernel and says it needs UAPI version 6.
+- Or install the spoofed manager attached next to it
+  (`KernelSU_Next_v3.4.2-200-g32e25d58-spoofed_33555-release.apk`): the same
+  build with a random package name, for apps that look for KernelSU-Next's.
+  Use one manager or the other, not both: uninstall the plain one first.
 - SUSFS v2.4.0 is built into the kernel. Configure it from the manager's SUSFS
   section or with `ksu_susfs`. KernelSU-Next's separate SUSFS module (its SUSFS
   autoload option) isn't needed: the kernel blocks it from loading.
