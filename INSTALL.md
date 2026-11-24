@@ -15,6 +15,8 @@
 
 1. Download `SilverArrow-KSUN-uke-<date>.zip` from the
    [releases](../../releases) and check its SHA-256 against the `.sha256sum` file.
+   You need root to flash from a manager, so on a ROM that isn't rooted yet,
+   flash from recovery instead (below).
 2. Open the manager, then **Install** (KernelSU) or **Flash** (KernelSU-Next),
    and pick the zip. Root apps that flash AnyKernel3 zips (e.g. Kernel Flasher)
    also work.
@@ -42,8 +44,10 @@ the ROM update brings its own kernel.
 
 - **About tablet > Kernel version** shows `6.1.182-SilverArrow-...`, or run
   `adb shell uname -r`.
-- Install the [KernelSU-Next manager](https://github.com/KernelSU-Next/KernelSU-Next/releases)
-  to manage root.
+- Install the KernelSU-Next manager attached to the same release
+  (`KernelSU_Next_v3.4.2_33355-release.apk`, the official KernelSU-Next build)
+  to manage root. If you already have the KernelSU-Next manager installed,
+  keep it: any manager from v3.4.2 on works.
 
 ## Going back
 
