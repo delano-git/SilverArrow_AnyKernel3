@@ -36,9 +36,11 @@ file_getprop() { grep "^$2=" "$1" | tail -n1 | cut -d= -f2-; }
 find_slot() {
   local slot=$(getprop ro.boot.slot_suffix 2>/dev/null);
   [ "$slot" ] || slot=$(grep -o 'androidboot.slot_suffix=.*$' /proc/cmdline | cut -d\  -f1 | cut -d= -f2);
+  [ "$slot" ] || slot=$(grep "^androidboot.slot_suffix " /proc/bootconfig 2>/dev/null | cut -d'"' -f2);
   if [ ! "$slot" ]; then
     slot=$(getprop ro.boot.slot 2>/dev/null);
     [ "$slot" ] || slot=$(grep -o 'androidboot.slot=.*$' /proc/cmdline | cut -d\  -f1 | cut -d= -f2);
+    [ "$slot" ] || slot=$(grep "^androidboot.slot " /proc/bootconfig 2>/dev/null | cut -d'"' -f2);
     [ "$slot" ] && slot=_$slot;
   fi;
   [ "$slot" == "normal" ] && unset slot;

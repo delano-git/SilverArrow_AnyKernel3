@@ -883,9 +883,11 @@ setup_ak() {
     1|auto)
       SLOT=$(getprop ro.boot.slot_suffix 2>/dev/null);
       [ "$SLOT" ] || SLOT=$(grep -o 'androidboot.slot_suffix=.*$' /proc/cmdline | cut -d\  -f1 | cut -d= -f2);
+      [ "$SLOT" ] || SLOT=$(grep "^androidboot.slot_suffix " /proc/bootconfig 2>/dev/null | cut -d'"' -f2);
       if [ ! "$SLOT" ]; then
         SLOT=$(getprop ro.boot.slot 2>/dev/null);
         [ "$SLOT" ] || SLOT=$(grep -o 'androidboot.slot=.*$' /proc/cmdline | cut -d\  -f1 | cut -d= -f2);
+        [ "$SLOT" ] || SLOT=$(grep "^androidboot.slot " /proc/bootconfig 2>/dev/null | cut -d'"' -f2);
         [ "$SLOT" ] && SLOT=_$SLOT;
       fi;
       [ "$SLOT" == "normal" ] && unset SLOT;
