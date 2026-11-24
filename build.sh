@@ -35,17 +35,23 @@ KMI_REFS=("$HERE"/kmi/*.txt)
 
 [ "${1:-}" = "--clean" ] && rm -rf "$OBJ"
 
-for d in "$KERNEL_REPO" "$CLANG" "$DEVICE_CONFIGS"; do
+RUST=$TOP/prebuilts/rust/linux-x86/1.88.0
+KBT=$TOP/prebuilts/kernel-build-tools/linux-x86
+SYSROOT=$TOP/prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.17-4.8/sysroot
+
+export PATH=$TOP/prebuilts/tools-lineage/linux-x86/bin:$TOP/prebuilts/build-tools/linux-x86/bin:$CLANG/bin:$RUST/bin:$TOP/prebuilts/clang-tools/linux-x86/bin:$KBT/bin:$PATH
+for d in "$KERNEL_REPO" "$CLANG" "$DEVICE_CONFIGS" "$RUST" "$KBT" "$SYSROOT"; do
     [ -d "$d" ] || { echo "missing $d" >&2; exit 1; }
 done
 
-export PATH=$CLANG/bin:$TOP/prebuilts/build-tools/linux-x86/bin:$TOP/prebuilts/kernel-build-tools/linux-x86/bin:$PATH
-export LD_LIBRARY_PATH=$CLANG/lib64:${LD_LIBRARY_PATH:-}
 export HIP_PATH=none PERL5LIB=$TOP/prebuilts/tools-lineage/common/perl-base
 
 MAKE_FLAGS=(
     -j"$(nproc)" -C "$SRC" O="$OBJ" ARCH=arm64
-    CC=clang LD=ld.lld LLVM=1 LLVM_IAS=1
+    CC=clang LD=ld.lld AR=llvm-ar LLVM=1 LLVM_IAS=1
+    HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar
+    HOSTCFLAGS="--sysroot=$SYSROOT -I$KBT/include"
+    HOSTLDFLAGS="--sysroot=$SYSROOT -Wl,-rpath,$KBT/lib64 -L $KBT/lib64 -fuse-ld=lld --rtlib=compiler-rt"
     BRANCH=android14-6.1 KMI_GENERATION=11
     KBUILD_BUILD_USER=delano KBUILD_BUILD_HOST=axion
 )
@@ -77,7 +83,7 @@ kmake olddefconfig
 # Kernel
 kmake Image
 IMAGE=$OBJ/arch/arm64/boot/Image
-KVER=$(strings "$IMAGE" | grep -m1 '^Linux version ' | cut -d' ' -f3)
+KVER=$(cat "$OBJ/include/config/kernel.release")
 echo "Built $KVER"
 
 # The zip is only safe if every module a ROM ships still matches our CRCs
