@@ -19,4 +19,6 @@ Kernel `6.1.182-SilverArrow-android14-11-14485-gd153dc47cbdb`
 - Keeps the android14-6.1 GKI module interface, so it loads the modules stock
   HyperOS OS3.0.304.0 and other GKI ROMs ship (all 3612 kernel symbols checked)
 - AnyKernel3 installer that replaces only the kernel in the active slot's `boot`
+  (with arm64 busybox and magiskboot from Magisk v31.1: uke can't run
+  AnyKernel3's 32-bit tools)
 - KernelSU-Next manager v3.4.2 (official build) attached to the release

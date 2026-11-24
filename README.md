@@ -9,6 +9,13 @@ The zip replaces only the kernel in the active slot's `boot` partition.
 On uke, `boot` holds just the kernel (boot header v4): the ramdisk is in
 `init_boot` and the DTBs and first-stage modules are in `vendor_boot`.
 
+uke's CPU cores are 64-bit only, so AnyKernel3's 32-bit tools can't run on
+it. `tools/` carries the arm64 `busybox`, `magiskboot` and `magiskpolicy` from
+the official Magisk v31.1 APK instead. AnyKernel3's other tools (`fec`,
+`httools_static`, `lptools_static`, `snapshotupdater_static`) are 32-bit
+only and are left out: they're only needed for flashing dtbo or dlkm images,
+which this zip doesn't.
+
 See [INSTALL.md](INSTALL.md) for how to flash it and how to go back, and
 [CHANGELOG.md](CHANGELOG.md) for what's in each release.
 
