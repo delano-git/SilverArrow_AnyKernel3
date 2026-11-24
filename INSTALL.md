@@ -13,7 +13,7 @@
 
 ## Flash from the KernelSU / KernelSU-Next manager
 
-1. Download `SilverArrow-KSUN-uke-<date>.zip` from the
+1. Download `SilverArrow-KSUN-SUSFS-uke-<date>.zip` from the
    [releases](../../releases) and check its SHA-256 against the `.sha256sum` file.
    You need root to flash from a manager, so on a ROM that isn't rooted yet,
    flash from recovery instead (below).
@@ -30,7 +30,7 @@
 3. Install the zip, or choose **Apply update > Apply from ADB** and run:
 
    ```bash
-   adb sideload SilverArrow-KSUN-uke-<date>.zip
+   adb sideload SilverArrow-KSUN-SUSFS-uke-<date>.zip
    ```
 
    Some recoveries warn that the zip's signature can't be verified. Choose
@@ -48,6 +48,9 @@ the ROM update brings its own kernel.
   (`KernelSU_Next_v3.4.2_33355-release.apk`, the official KernelSU-Next build)
   to manage root. If you already have the KernelSU-Next manager installed,
   keep it: any manager from v3.4.2 on works.
+- SUSFS v2.4.0 is built into the kernel. Configure it from the manager's SUSFS
+  section or with `ksu_susfs`. KernelSU-Next's separate SUSFS module (its SUSFS
+  autoload option) isn't needed: the kernel blocks it from loading.
 
 ## Going back
 

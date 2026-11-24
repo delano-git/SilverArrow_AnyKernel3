@@ -96,7 +96,7 @@ done
 
 # AnyKernel3 zip
 DATE=$(date +%Y%m%d)
-NAME=SilverArrow-KSUN-uke-$DATE
+NAME=SilverArrow-KSUN-SUSFS-uke-$DATE
 STAGE=$OUT/stage
 rm -rf "$STAGE" && mkdir -p "$STAGE" "$DIST"
 cp -r "$HERE/META-INF" "$HERE/tools" "$HERE/anykernel.sh" "$HERE/LICENSE" "$STAGE/"

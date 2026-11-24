@@ -24,7 +24,7 @@ for a in "$@"; do
 done
 TAG=${ARGS[0]:-}
 [ -n "$TAG" ] || { echo "usage: $0 <tag> [zip] [--draft]" >&2; exit 1; }
-ZIP=${ARGS[1]:-$(ls -t "$HERE"/out/dist/SilverArrow-KSUN-uke-*.zip 2>/dev/null | head -1)}
+ZIP=${ARGS[1]:-$(ls -t "$HERE"/out/dist/SilverArrow-KSUN-SUSFS-uke-*.zip 2>/dev/null | head -1)}
 [ -f "$ZIP" ] || { echo "no zip to release, run ./build.sh first" >&2; exit 1; }
 
 # KernelSU-Next manager, the plain (not spoofed) release APK

@@ -1,8 +1,8 @@
 # SilverArrow for Xiaomi Pad 7 (uke)
 
 SilverArrow is a performance and battery kernel for the Xiaomi Pad 7 (uke)
-with KernelSU-Next built in. It's released as an AnyKernel3 zip that can be
-flashed from recovery or from the KernelSU / KernelSU-Next manager. Each
+with KernelSU-Next and SUSFS built in. It's released as an AnyKernel3 zip
+that can be flashed from recovery or from the KernelSU / KernelSU-Next manager. Each
 release also carries the official KernelSU-Next manager APK.
 
 The zip replaces only the kernel in the active slot's `boot` partition.
@@ -34,7 +34,7 @@ The kernel source and config come from the AxionOS tree this repo lives in
 `device/xiaomi/uke/configs/kernel`, and `prebuilts/clang` r563880c).
 
 ```bash
-./build.sh            # kernel + KMI check + out/dist/SilverArrow-KSUN-uke-<date>.zip
+./build.sh            # kernel + KMI check + out/dist/SilverArrow-KSUN-SUSFS-uke-<date>.zip
 ./build.sh --clean    # same, from an empty object dir
 ./release.sh v1       # GitHub release v1: newest zip, KernelSU-Next manager, CHANGELOG.md notes
 ```
@@ -50,4 +50,6 @@ kmi/kmi_check.py dump kmi/<rom>.txt <extracted vendor_boot> <vendor_dlkm> <syste
 
 ## Credits
 
-AnyKernel3 by osm0sis (see `AnyKernel3.md`), KernelSU-Next.
+AnyKernel3 by osm0sis (see `AnyKernel3.md`), KernelSU-Next, SUSFS by
+simonpunk ([susfs4ksu](https://gitlab.com/simonpunk/susfs4ksu)) and pershoot's
+KernelSU-Next SUSFS integration.
