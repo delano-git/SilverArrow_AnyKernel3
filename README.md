@@ -8,6 +8,9 @@ The zip replaces only the kernel in the active slot's `boot` partition.
 On uke, `boot` holds just the kernel (boot header v4): the ramdisk is in
 `init_boot` and the DTBs and first-stage modules are in `vendor_boot`.
 
+See [INSTALL.md](INSTALL.md) for how to flash it and how to go back, and
+[CHANGELOG.md](CHANGELOG.md) for what's in each release.
+
 ## Which ROMs it works on
 
 SilverArrow keeps the android14-6.1 GKI module interface (KMI generation 11),
@@ -32,7 +35,7 @@ The kernel source and config come from the AxionOS tree this repo lives in
 ```bash
 ./build.sh            # kernel + KMI check + out/dist/SilverArrow-KSUN-uke-<date>.zip
 ./build.sh --clean    # same, from an empty object dir
-./release.sh          # draft GitHub release with the newest zip
+./release.sh v1       # GitHub release v1 with the newest zip and its CHANGELOG.md section
 ```
 
 `build.sh` builds from a git worktree at `out/src`, so the ROM tree can stay
