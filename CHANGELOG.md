@@ -21,4 +21,6 @@ Kernel `6.1.182-SilverArrow-android14-11-14485-gd153dc47cbdb`
 - AnyKernel3 installer that replaces only the kernel in the active slot's `boot`
   (with arm64 busybox and magiskboot from Magisk v31.1: uke can't run
   AnyKernel3's 32-bit tools)
-- KernelSU-Next manager v3.4.2 (official build) attached to the release
+- KernelSU-Next manager v3.4.2-200-g32e25d58 (33555) attached to the release:
+  KernelSU-Next's CI build of the imported commit, signed with their release
+  key. The v3.4.2 release manager doesn't support this kernel (UAPI 6)

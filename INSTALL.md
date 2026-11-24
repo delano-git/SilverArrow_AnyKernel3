@@ -45,9 +45,10 @@ the ROM update brings its own kernel.
 - **About tablet > Kernel version** shows `6.1.182-SilverArrow-...`, or run
   `adb shell uname -r`.
 - Install the KernelSU-Next manager attached to the same release
-  (`KernelSU_Next_v3.4.2_33355-release.apk`, the official KernelSU-Next build)
-  to manage root. If you already have the KernelSU-Next manager installed,
-  keep it: any manager from v3.4.2 on works.
+  (`KernelSU_Next_v3.4.2-200-g32e25d58_33555-release.apk`, KernelSU-Next's own
+  CI build of the commit in this kernel, signed with their release key) to
+  manage root. It installs over an existing KernelSU-Next manager. The v3.4.2
+  release manager is too old for this kernel and says it needs UAPI version 6.
 - SUSFS v2.4.0 is built into the kernel. Configure it from the manager's SUSFS
   section or with `ksu_susfs`. KernelSU-Next's separate SUSFS module (its SUSFS
   autoload option) isn't needed: the kernel blocks it from loading.

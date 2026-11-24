@@ -3,7 +3,7 @@
 SilverArrow is a performance and battery kernel for the Xiaomi Pad 7 (uke)
 with KernelSU-Next and SUSFS built in. It's released as an AnyKernel3 zip
 that can be flashed from recovery or from the KernelSU / KernelSU-Next manager. Each
-release also carries the official KernelSU-Next manager APK.
+release also carries the KernelSU-Next manager APK that matches it.
 
 The zip replaces only the kernel in the active slot's `boot` partition.
 On uke, `boot` holds just the kernel (boot header v4): the ramdisk is in
